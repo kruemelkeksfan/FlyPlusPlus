@@ -46,8 +46,10 @@ void AAirplane::Tick(float deltaTime)
 		pitch += vertical * sensitivity * deltaTime;
 		pitch = FMath::Clamp(pitch, -90.0f, 90.0f);
 		roll += horizontal * sensitivity * deltaTime;
-		float adjustedThrottleInput = (throttleInput + 1.0f) / 2.0f;
-		if (adjustedThrottleInput != 0.5f)
+
+		// Calculate Throttle
+		float adjustedThrottleInput = (throttleInput + 1.0f) / 2.0f;	// throttleInput [-1.0; 1.0], adjustedThrottleInput [0.0; 1.0]
+		if (throttleInput < -0.00001f || throttleInput > 0.00001f)		// Avoid comparing floats with !=
 		{
 			if (adjustedThrottleInput > throttle)
 			{
@@ -55,7 +57,7 @@ void AAirplane::Tick(float deltaTime)
 			}
 			else
 			{
-				throttle -= FMath::Min(throttleSensitivity * deltaTime, throttle - adjustedThrottleInput);
+				throttle += FMath::Max(-throttleSensitivity * deltaTime, adjustedThrottleInput - throttle);
 			}
 		}
 
